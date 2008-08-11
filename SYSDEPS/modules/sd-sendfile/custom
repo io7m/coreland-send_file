@@ -1,0 +1,79 @@
+#!/bin/sh
+
+fout="$1"
+lout="$2"
+sysdeps="$3"
+
+finish()
+{
+cat >> "${fout}" <<EOF
+#endif
+EOF
+  rm -f trybsd1 trybsd1.o \
+        trysysv1 trysysv1.o \
+        tryhpux1 tryhpux1.o
+  touch "${lout}"
+  exit 0
+}
+
+cat >> "${fout}" <<EOF
+#ifndef _SENDFILE_H
+#define _SENDFILE_H
+EOF
+
+${SYSDEP_CC} ${SYSDEP_CFLAGS} -c -o trybsd1.o trybsd1.c >/dev/null 2>&1
+if [ $? -eq 0 ]
+then
+  ${SYSDEP_LD} -o trybsd1 trybsd1.o ${SYSDEP_LDFLAGS} >/dev/null 2>&1
+  if [ $? -eq 0 ]
+  then
+    echo '#define HAVE_SENDFILE' >> "${fout}"
+    echo '#define HAVE_SENDFILE_BSD' >> "${fout}"
+    echo "sendfile: bsd" >> "${sysdeps}"
+    echo "sendfile-libs: " >> "${sysdeps}"
+    finish
+  fi
+fi
+
+${SYSDEP_CC} ${SYSDEP_CFLAGS} -c -o trysysv1.o trysysv1.c >/dev/null 2>&1
+if [ $? -eq 0 ]
+then
+  ${SYSDEP_LD} -o trysysv1 trysysv1.o ${SYSDEP_LDFLAGS} >/dev/null 2>&1
+  if [ $? -eq 0 ]
+  then
+    echo '#define HAVE_SENDFILE' >> "${fout}"
+    echo '#define HAVE_SENDFILE_SYSV' >> "${fout}"
+    echo "sendfile: sysv" >> "${sysdeps}"
+    echo "sendfile-libs: " >> "${sysdeps}"
+    finish
+  else
+    ${SYSDEP_LD} -o trysysv1 trysysv1.o ${SYSDEP_LDFLAGS} -lsendfile >/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
+      echo '#define HAVE_SENDFILE' >> "${fout}"
+      echo '#define HAVE_SENDFILE_SYSV' >> "${fout}"
+      echo "sendfile: sysv" >> "${sysdeps}"
+      echo "-lsendfile" >> "${lout}"
+      echo "sendfile-libs: -lsendfile" >> "${sysdeps}"
+      finish
+    fi
+  fi
+fi
+
+${SYSDEP_CC} ${SYSDEP_CFLAGS} -c -o tryhpux1.o tryhpux1.c >/dev/null 2>&1
+if [ $? -eq 0 ]
+then
+  ${SYSDEP_LD} -o tryhpux1 tryhpux1.o ${SYSDEP_LDFLAGS} >/dev/null 2>&1
+  if [ $? -eq 0 ]
+  then
+    echo '#define HAVE_SENDFILE' >> "${fout}"
+    echo '#define HAVE_SENDFILE_HPUX' >> "${fout}"
+    echo "sendfile: hpux" >> "${sysdeps}"
+    echo "sendfile-libs: " >> "${sysdeps}"
+    finish
+  fi
+fi
+
+echo "sendfile: none" >> "${sysdeps}"
+echo "sendfile-libs: " >> "${sysdeps}"
+finish

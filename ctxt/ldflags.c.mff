@@ -1,0 +1,3 @@
+ctxt/ldflags.c: mk-ctxt libs-sendfile
+	rm -f ctxt/ldflags.c
+	./mk-ctxt ctxt_ldflags < libs-sendfile > ctxt/ldflags.c
