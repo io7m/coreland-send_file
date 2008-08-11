@@ -55,6 +55,8 @@ send_file_fd (int out_fd, int in_fd, uint64 offset, uint64 size, uint64 *sent)
  */
 
 #if defined (HAVE_SENDFILE_SYSV)
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/sendfile.h>
 
 int
@@ -62,13 +64,20 @@ send_file_fd (int out_fd, int in_fd, uint64 offset, uint64 size, uint64 *sent)
 {
   ssize_t r_send = 0;
   off_t off = (off_t) offset;
+  struct stat sb;
 
-  if (sendfile (out_fd, in_fd, &off, size) == -1) {
-    *sent = 0;
-    return -1;
+  if (size == SEND_FILE_ALL) {
+    if (fstat (in_fd, &sb) == -1) goto FAIL;
+    size = sb.st_size; 
   }
+
+  if (sendfile (out_fd, in_fd, &off, size) == -1) goto FAIL;
   *sent = r_send;
   return 0;
+
+  FAIL:
+  *sent = 0;
+  return -1;
 }
 #endif /* HAVE_SENDFILE_SYSV */
 
