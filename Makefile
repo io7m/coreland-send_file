@@ -44,6 +44,9 @@ _sendfile.h:
 	@echo SYSDEPS sd-sendfile run create libs-sendfile _sendfile.h 
 	@(cd SYSDEPS/modules/sd-sendfile && ./run)
 libs-sendfile: _sendfile.h
+_sysinfo.h:
+	@echo SYSDEPS sysinfo run create _sysinfo.h 
+	@(cd SYSDEPS/modules/sysinfo && ./run)
 
 
 corelib-flags_clean:
@@ -61,6 +64,9 @@ integer-libs-S_clean:
 sd-sendfile_clean:
 	@echo SYSDEPS sd-sendfile clean libs-sendfile _sendfile.h 
 	@(cd SYSDEPS/modules/sd-sendfile && ./clean)
+sysinfo_clean:
+	@echo SYSDEPS sysinfo clean _sysinfo.h 
+	@(cd SYSDEPS/modules/sysinfo && ./clean)
 
 
 sysdeps_clean:\
@@ -69,6 +75,7 @@ corelib-libs-S_clean \
 integer-flags_clean \
 integer-libs-S_clean \
 sd-sendfile_clean \
+sysinfo_clean \
 
 
 # -- SYSDEPS end
@@ -92,6 +99,10 @@ conf-cc mk-cctype
 conf-ldtype:\
 conf-ld mk-ldtype
 	./mk-ldtype > conf-ldtype.tmp && mv conf-ldtype.tmp conf-ldtype
+
+conf-sosuffix:\
+mk-sosuffix
+	./mk-sosuffix > conf-sosuffix.tmp && mv conf-sosuffix.tmp conf-sosuffix
 
 conf-systype:\
 mk-systype
@@ -253,6 +264,9 @@ conf-ld conf-systype conf-cctype
 mk-mk-ctxt:\
 conf-cc
 
+mk-sosuffix:\
+conf-systype
+
 mk-systype:\
 conf-cc
 
@@ -261,7 +275,7 @@ cc-link send_file-conf.ld send_file-conf.o ctxt/ctxt.a
 	./cc-link send_file-conf send_file-conf.o ctxt/ctxt.a
 
 send_file-conf.o:\
-cc-compile send_file-conf.c ctxt.h
+cc-compile send_file-conf.c ctxt.h _sysinfo.h
 	./cc-compile send_file-conf.c
 
 send_file.a:\
@@ -283,7 +297,7 @@ obj_clean:
 	installer installer.o instchk instchk.o insthier.o send_file-conf \
 	send_file-conf.o send_file.a send_file.o
 ext_clean:
-	rm -f conf-cctype conf-ldtype conf-systype mk-ctxt
+	rm -f conf-cctype conf-ldtype conf-sosuffix conf-systype mk-ctxt
 
 regen:
 	cpj-genmk > Makefile.tmp && mv Makefile.tmp Makefile

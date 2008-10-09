@@ -18,6 +18,8 @@ static long str_rchr(register const char *, register int);
 
 /* PROJECT SPECIFIC */
 
+#include "_sysinfo.h"
+
 const char progname[] = "send_file-conf";
 
 void flag_incdir(void)
