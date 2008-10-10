@@ -1,0 +1,8 @@
+darwin 8.11.0 gcc 4.2.0 ppc
+freebsd 6.3-release-p1 gcc 3.4.6 x86
+freebsd 6.3-release-p4 gcc 4.2.2 x86
+freebsd 6.3-release-p5 gcc 4.2.2 x86
+hpux b.11.23 hp_c 0.0.0 parisc
+hpux b.11.31 hp_c 3.0.6 ia64
+linux 2.6.26-1-686 gcc 4.3.1 x86
+sunos 5.9-generic_118559-30 sun_c 5.8.0 x86
