@@ -1,0 +1,7 @@
+<p>
+This library provides a portability abstraction around the various
+implementations of the sendfile() system call. Currently supported are
+the System-V/Linux/Solaris versions, the HPUX version, the BSD version
+and a fallback buffered IO implementation in the case of the host system
+not having any of the above.
+</p>
